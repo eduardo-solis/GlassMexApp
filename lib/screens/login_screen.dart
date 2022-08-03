@@ -51,22 +51,32 @@ class _LoginScreenState extends State<LoginScreen> {
         if (data != null) {
           setSP(data).whenComplete(() {
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text(
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: const Text(
                 "Se inicio sesión correctamente",
               ),
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
               backgroundColor: Colors.green,
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ));
           });
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text(
               "No se encontro el usuario",
               style: TextStyle(color: Colors.black),
             ),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             backgroundColor: Colors.amber,
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ));
         }
       });

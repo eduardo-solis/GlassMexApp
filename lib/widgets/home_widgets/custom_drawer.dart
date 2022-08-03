@@ -83,13 +83,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   void cerrarSesion() {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: const Text(
         "Se cerro la sesión",
         style: TextStyle(color: Colors.black),
       ),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
       backgroundColor: Colors.amber,
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
     ));
     Navigator.pop(context);
   }

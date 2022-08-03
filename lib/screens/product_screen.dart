@@ -114,22 +114,32 @@ class _ProductScreenState extends State<ProductScreen> {
         if (data != null) {
           setSP(data).whenComplete(() {
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text(
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: const Text(
                 "Se inicio sesión correctamente",
               ),
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
               backgroundColor: Colors.green,
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ));
           });
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text(
               "No se encontro el usuario",
               style: TextStyle(color: Colors.black),
             ),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             backgroundColor: Colors.amber,
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ));
         }
       });
@@ -212,14 +222,10 @@ class _ProductScreenState extends State<ProductScreen> {
                   }
                   return null;
                 },
-                decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock),
-                    labelText: "Contraseña",
-                    suffixIcon: IconButton(
-                        onPressed: () => setState(() {
-                              mostrarContrasenia = !mostrarContrasenia;
-                            }),
-                        icon: CustomIcon(mostrar: mostrarContrasenia))),
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.lock),
+                  labelText: "Contraseña",
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -275,7 +281,22 @@ class _ProductScreenState extends State<ProductScreen> {
             registerDetalle(venta.idVenta, data.idProducto, subtotal, total,
                 int.parse(cantidad.text), cmVendidos, f);
           }
-        }).whenComplete(() => Navigator.pop(context));
+        }).whenComplete(() {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: const Text(
+                  "Se añadio el producto al carrito de compras",
+                ),
+                duration: const Duration(seconds: 2),
+                backgroundColor: Colors.green,
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                )),
+          );
+          Navigator.pop(context);
+        });
       } else {
         abrirDialogo();
       }
