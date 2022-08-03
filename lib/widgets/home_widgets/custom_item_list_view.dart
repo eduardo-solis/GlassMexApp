@@ -61,14 +61,10 @@ class _CustomItemListViewState extends State<CustomItemListView> {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(50),
                       color: HexColor("01688c")),
-                  child: Icon(
-                      isVisibility
-                          ? Icons.arrow_drop_up
-                          : Icons.arrow_drop_down,
-                      size: 40,
-                      color: Colors.white),
+                  child: Icon(isVisibility ? Icons.remove : Icons.add,
+                      size: 30, color: Colors.white),
                 )
               ],
             ),
@@ -78,22 +74,25 @@ class _CustomItemListViewState extends State<CustomItemListView> {
               child: Column(
                 children: [
                   ListTile(
-                    title: Text("${widget.nombre} con 4 mm de grosor"),
-                    trailing: const Icon(Icons.arrow_forward_ios_outlined),
+                    title: const Text("Grosor 4 mm"),
+                    trailing: Icon(Icons.arrow_forward_ios_outlined,
+                        color: HexColor("01688c")),
                     onTap: () {
                       irDetalleProducto(widget.nombre, "4", widget.image);
                     },
                   ),
                   ListTile(
-                    title: Text("${widget.nombre} con 6 mm de grosor"),
-                    trailing: const Icon(Icons.arrow_forward_ios_outlined),
+                    title: const Text("Grosor 6 mm"),
+                    trailing: Icon(Icons.arrow_forward_ios_outlined,
+                        color: HexColor("01688c")),
                     onTap: () {
                       irDetalleProducto(widget.nombre, "6", widget.image);
                     },
                   ),
                   ListTile(
-                    title: Text("${widget.nombre} con 10 mm de grosor"),
-                    trailing: const Icon(Icons.arrow_forward_ios_outlined),
+                    title: const Text("Grosor 10 mm"),
+                    trailing: Icon(Icons.arrow_forward_ios_outlined,
+                        color: HexColor("01688c")),
                     onTap: () {
                       irDetalleProducto(widget.nombre, "10", widget.image);
                     },

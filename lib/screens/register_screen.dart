@@ -97,15 +97,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void guardar() {
     if (widget.idUser == 0) {
-      print("registrando");
       register();
+      Navigator.pop(context);
     } else {
-      print("actualizando");
       update();
+      Navigator.pop(context);
     }
   }
 
-  void register() async {
+  register() async {
     String name = nombre.text;
     String lastName = primerApellido.text;
     String secondLastName = segundoApellido.text;
@@ -146,8 +146,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     await _clientesRepository.register(modelo);
 
     limpiarCampos();
-
-    Navigator.pop(context);
   }
 
   update() async {
@@ -195,7 +193,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     });
     limpiarCampos();
-    Navigator.pop(context);
   }
 
   Future setSP(Clientes user) async {
@@ -271,6 +268,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   if (value!.isEmpty || value.length < 5 || value.length > 5) {
                     return "El Nombre debe ser por lo menos de 5 caracteres";
                   }
+                  return null;
                 }),
             const SizedBox(
               height: 15,
@@ -287,6 +285,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   if (value!.isEmpty || value.length < 5 || value.length > 5) {
                     return "El Primer Apellido debe ser por lo menos de 5 caracteres";
                   }
+                  return null;
                 }),
             const SizedBox(
               height: 15,
@@ -397,6 +396,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               value.length >= 5) {
                             return "El año debe ser de 4 caracteres";
                           }
+                          return null;
                         }),
                   ),
                 ],
@@ -412,6 +412,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   if (value!.isEmpty || value.length < 5 || value.length > 5) {
                     return "La calle debe ser de 5 caracteres";
                   }
+                  return null;
                 }),
             const SizedBox(
               height: 15,
@@ -424,6 +425,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 if (value!.isEmpty) {
                   return "El numero debe tener un valor";
                 }
+                return null;
               },
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
@@ -437,6 +439,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   if (value!.isEmpty || value.length < 5 || value.length > 5) {
                     return "La colonia debe ser de 5 caracteres";
                   }
+                  return null;
                 }),
             const SizedBox(
               height: 15,
@@ -449,6 +452,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 if (value!.isEmpty || value.length < 5 || value.length > 5) {
                   return "El cp debe ser de 5 caracteres";
                 }
+                return null;
               },
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
@@ -491,6 +495,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 } else if (!email.hasMatch(value)) {
                   return "El correo no tiene el formato correcto";
                 }
+                return null;
               },
               controller: correo,
             ),
@@ -509,6 +514,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   } else if (!email.hasMatch(value)) {
                     return "El correo no tiene el formato correcto";
                   }
+                  return null;
                 }),
             const SizedBox(
               height: 15,
@@ -520,6 +526,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 if (value!.isEmpty || value.length <= 7) {
                   return "Ingrese un valor igual o mayor a 8 caracteres";
                 }
+                return null;
               },
             ),
             const SizedBox(

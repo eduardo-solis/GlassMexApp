@@ -168,27 +168,12 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   Column(
                     children: [
                       Text(
-                        "Venta No. $idVenta",
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      Text(
                         "Total: $total",
-                        style: const TextStyle(fontSize: 20),
+                        style: const TextStyle(fontSize: 30),
                       )
                     ],
                   ),
                 ],
-              ),
-            ),
-            Visibility(
-              visible: activarBoton,
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: pagar,
-                  child: const Text("Pagar"),
-                ),
               ),
             ),
             Column(
@@ -252,6 +237,19 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             )
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          if (activarBoton) {
+            pagar();
+          }
+        },
+        splashColor: Colors.green,
+        label: const Text(
+          "Pagar",
+          style: TextStyle(fontSize: 18),
+        ),
+        icon: const Icon(Icons.monetization_on_outlined),
       ),
     );
   }

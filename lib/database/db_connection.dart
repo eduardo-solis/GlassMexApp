@@ -10,7 +10,7 @@ class DataBaseConnection {
       var sqlCreate = sqlCreateDatabase();
       db.execute(sqlCreate);
     }, onUpgrade: (db, oldVersion, newVersion) {
-      print("Actualizando de la versión $oldVersion a la $newVersion");
+      //print("Actualizando de la versión $oldVersion a la $newVersion");
       var sqlCreate = sqlUpgradeVersion5();
       if (oldVersion == 5) {
         db.execute(sqlCreate);

@@ -10,7 +10,6 @@ import 'package:glassmex/models/ventas.dart';
 import 'package:glassmex/repositories/clientes_repository.dart';
 import 'package:glassmex/repositories/detalle_ventas_repository.dart';
 import 'package:glassmex/repositories/ventas_repository.dart';
-import 'package:glassmex/screens/login_screen.dart';
 import 'package:glassmex/screens/register_screen.dart';
 import 'package:glassmex/widgets/product_widgets/custom_form_cc.dart';
 import 'package:glassmex/widgets/product_widgets/custom_form_ro.dart';
@@ -513,6 +512,7 @@ class _ProductScreenState extends State<ProductScreen> {
                             return "La cantidad debe ser mayor a 0";
                           }
                         }
+                        return null;
                       },
                       textAlign: TextAlign.end,
                       decoration: const InputDecoration(labelText: "Cantidad"),
