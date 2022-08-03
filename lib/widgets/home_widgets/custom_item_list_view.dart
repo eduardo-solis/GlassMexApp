@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glassmex/helpers/hexcolor.dart';
 import 'package:glassmex/screens/product_screen.dart';
 
 class CustomItemListView extends StatefulWidget {
@@ -57,6 +58,17 @@ class _CustomItemListViewState extends State<CustomItemListView> {
                     ),
                     Text(widget.grosor, style: const TextStyle(fontSize: 18)),
                   ],
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: HexColor("01688c")),
+                  child: Icon(
+                      isVisibility
+                          ? Icons.arrow_drop_up
+                          : Icons.arrow_drop_down,
+                      size: 40,
+                      color: Colors.white),
                 )
               ],
             ),
@@ -66,19 +78,22 @@ class _CustomItemListViewState extends State<CustomItemListView> {
               child: Column(
                 children: [
                   ListTile(
-                    title: const Text("De 4 mm"),
+                    title: Text("${widget.nombre} con 4 mm de grosor"),
+                    trailing: const Icon(Icons.arrow_forward_ios_outlined),
                     onTap: () {
                       irDetalleProducto(widget.nombre, "4", widget.image);
                     },
                   ),
                   ListTile(
-                    title: const Text("De 6 mm"),
+                    title: Text("${widget.nombre} con 6 mm de grosor"),
+                    trailing: const Icon(Icons.arrow_forward_ios_outlined),
                     onTap: () {
                       irDetalleProducto(widget.nombre, "6", widget.image);
                     },
                   ),
                   ListTile(
-                    title: const Text("De 10 mm"),
+                    title: Text("${widget.nombre} con 10 mm de grosor"),
+                    trailing: const Icon(Icons.arrow_forward_ios_outlined),
                     onTap: () {
                       irDetalleProducto(widget.nombre, "10", widget.image);
                     },
