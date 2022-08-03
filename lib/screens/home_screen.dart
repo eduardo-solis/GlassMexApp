@@ -20,8 +20,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController buscar = TextEditingController();
   late Database _database;
-  late ProductosRepository _ProductosRepository;
-  List<Productos> _productos = List.empty();
+  late ProductosRepository productosRepository;
+  List<Productos> productos = List.empty();
 
   @override
   void initState() {
@@ -31,14 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   initVariables() async {
     _database = await DataBaseConnection.initiateDataBase();
-    _database.close();
-    _database = await DataBaseConnection.initiateDataBase();
-    _ProductosRepository = ProductosRepository(_database);
+    productosRepository = ProductosRepository(_database);
     refreshGrid();
   }
 
   refreshGrid() async {
-    var nuevosProductos = await _ProductosRepository.getAll();
+    var nuevosProductos = await productosRepository.getAll();
 
     if (nuevosProductos.isEmpty) {
       for (var i = 0; i < 9; i++) {
@@ -58,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
             modelo.grosor = "10";
             modelo.precioCompra = 6075;
           }
-          await _ProductosRepository.register(modelo);
+          await productosRepository.register(modelo);
         }
 
         if (i >= 3 && i <= 5) {
@@ -77,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
             modelo.grosor = "10";
             modelo.precioCompra = 6750;
           }
-          await _ProductosRepository.register(modelo);
+          await productosRepository.register(modelo);
         }
 
         if (i > 5) {
@@ -96,15 +94,15 @@ class _HomeScreenState extends State<HomeScreen> {
             modelo.grosor = "10";
             modelo.precioCompra = 7087.50;
           }
-          await _ProductosRepository.register(modelo);
+          await productosRepository.register(modelo);
         }
       }
 
-      nuevosProductos = await _ProductosRepository.getAll();
+      nuevosProductos = await productosRepository.getAll();
     }
 
     setState(() {
-      _productos = nuevosProductos;
+      productos = nuevosProductos;
     });
   }
 
@@ -136,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Center(
                 child: Text(
-                  "Elije de nuestro catalogo!!",
+                  "Elige de nuestro catálogo!!",
                   style: TextStyle(fontSize: 20),
                 ),
               ),

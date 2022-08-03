@@ -54,7 +54,7 @@ class DetalleVentasRepository {
 
   Future<int> update(DetalleVentas modelo) async {
     // Actualización utilizando raw
-    var count = await _database.rawUpdate(
+    await _database.rawUpdate(
         'UPDATE detalle_ventas SET precioUnitario = ?, cantidad = ?, subtotal = ?, cmcVendidos = ?, forma = ? WHERE idDetalleVenta = ?',
         [
           modelo.precioUnitario,
@@ -64,17 +64,16 @@ class DetalleVentasRepository {
           modelo.forma,
           modelo.idDetalleVenta
         ]);
-    print("Se actualizo el detalle");
     return modelo.idDetalleVenta;
   }
 
   deleteAllVenta(int id) async {
-    var count = await _database
+    await _database
         .rawDelete('DELETE FROM detalle_ventas WHERE idVenta = ?', [id]);
   }
 
   delete(int id) async {
-    var count = await _database
+    await _database
         .rawDelete('DELETE FROM detalle_ventas WHERE idDetalleVenta = ?', [id]);
   }
 }

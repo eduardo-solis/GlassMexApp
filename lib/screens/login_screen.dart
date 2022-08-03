@@ -33,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initVariables();
   }
@@ -76,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future setSP(Clientes user) async {
     final SharedPreferences sp = await _pref;
-    print(user.segundoApellido);
+
     sp.setString("idCliente", user.idCliente.toString());
     sp.setString("nombre", user.nombre);
     sp.setString("primerApellido", user.primerApellido);
@@ -103,7 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return const RegisterScreen();
     }));
-    print("Se dirige al registro");
   }
 
   @override
@@ -142,6 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         } else if (!email.hasMatch(value)) {
                           return "El correo no tiene el formato correcto";
                         }
+                        return null;
                       },
                       decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.email_outlined),
@@ -155,6 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       } else if (value.length <= 8) {
                         return "La contraseña debe ser mayor de 8 caracteres";
                       }
+                      return null;
                     },
                     decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.lock),

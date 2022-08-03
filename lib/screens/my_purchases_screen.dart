@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glassmex/models/detalle_ventas.dart';
-import 'package:glassmex/models/productos.dart';
+
 import 'package:glassmex/repositories/detalle_ventas_repository.dart';
-import 'package:glassmex/repositories/productos_repository.dart';
 
 import 'package:sqflite/sqflite.dart';
 
@@ -21,7 +20,7 @@ class MyPurchasesScreen extends StatefulWidget {
 
 class _MyPurchasesScreenState extends State<MyPurchasesScreen> {
   late Database _database;
-  late VentasRepository _VentasRepository;
+  late VentasRepository ventasRepository;
   List<Ventas> _ventas = List.empty();
   bool mostrarDetalle = false;
 
@@ -35,12 +34,12 @@ class _MyPurchasesScreenState extends State<MyPurchasesScreen> {
   initVariables() async {
     _database = await DataBaseConnection.initiateDataBase();
     //print(_database);
-    _VentasRepository = VentasRepository(_database);
+    ventasRepository = VentasRepository(_database);
     refreshGrid();
   }
 
   refreshGrid() async {
-    _ventas = await _VentasRepository.getVentaCerradaByClient(widget.idUser);
+    _ventas = await ventasRepository.getVentaCerradaByClient(widget.idUser);
     setState(() {});
   }
 
@@ -134,7 +133,7 @@ class _CustomDetalleState extends State<CustomDetalle> {
             child: Text(mostrar ? "Ocultar" : "Mostrar")),
         Column(
             children: List.generate(_detalle.length, (index) {
-          return Container(
+          return SizedBox(
             width: double.infinity,
             child: Visibility(
               visible: mostrar,

@@ -49,7 +49,7 @@ class VentasRepository {
   Future<List<Ventas>> getVentaCerradaByClient(int id) async {
     List result = await _database.rawQuery(
         "SELECT * FROM ventas WHERE idCliente = ? AND estatus = 2", [id]);
-    print(result);
+
     var lista = result
         .map((item) => Ventas(
             int.parse(item["idVenta"].toString()),
@@ -69,23 +69,21 @@ class VentasRepository {
   }
 
   update(Ventas modelo) async {
-    var count = await _database.rawUpdate(
-        'UPDATE ventas SET total = ? WHERE idVenta = ?',
+    await _database.rawUpdate('UPDATE ventas SET total = ? WHERE idVenta = ?',
         [modelo.total, modelo.idVenta]);
   }
 
   updateTotal(int idVenta, double total) async {
-    var count = await _database.rawUpdate(
+    await _database.rawUpdate(
         'UPDATE ventas SET total = ? WHERE idVenta = ?', [total, idVenta]);
   }
 
   pay(int id) async {
-    var count = await _database
+    await _database
         .rawUpdate('UPDATE ventas SET estatus = ? WHERE idVenta = ?', [2, id]);
   }
 
   delete(int id) async {
-    var count =
-        await _database.rawDelete('DELETE FROM ventas WHERE idVenta = ?', [id]);
+    await _database.rawDelete('DELETE FROM ventas WHERE idVenta = ?', [id]);
   }
 }

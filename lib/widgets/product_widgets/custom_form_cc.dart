@@ -35,6 +35,7 @@ class CustomFormCC extends StatelessWidget {
                               return "El valor debe ser entre 5 y 250 cm";
                             }
                           }
+                          return null;
                         },
                         controller: primerValor,
                         textAlign: TextAlign.end,
@@ -83,6 +84,7 @@ class CustomFormCC extends StatelessWidget {
                               return "El valor debe ser entre 5 y 250 cm";
                             }
                           }
+                          return null;
                         },
                         decoration:
                             const InputDecoration(labelText: "Diametro"),

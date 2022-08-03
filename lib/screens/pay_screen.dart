@@ -8,7 +8,7 @@ import '../repositories/ventas_repository.dart';
 class PayScreen extends StatefulWidget {
   final int idVenta;
   final double total;
-  PayScreen({Key? key, required this.idVenta, required this.total})
+  const PayScreen({Key? key, required this.idVenta, required this.total})
       : super(key: key);
 
   @override
@@ -75,6 +75,7 @@ class _PayScreenState extends State<PayScreen> {
                     if (value!.isEmpty || value.length <= 15) {
                       return "Debe introducir un numero de tarjeta valido";
                     }
+                    return null;
                   },
                 ),
                 TextFormField(
@@ -90,6 +91,7 @@ class _PayScreenState extends State<PayScreen> {
                         value.length > 3) {
                       return "Debe introducir un cvv valido";
                     }
+                    return null;
                   },
                 ),
                 Container(
@@ -115,6 +117,7 @@ class _PayScreenState extends State<PayScreen> {
                               value.length >= 3) {
                             return "Debe introducir un mes valido";
                           }
+                          return null;
                         },
                       ),
                     ),
@@ -136,6 +139,7 @@ class _PayScreenState extends State<PayScreen> {
                               value.length >= 3) {
                             return "Debe introducir un año valido";
                           }
+                          return null;
                         },
                       ),
                     )

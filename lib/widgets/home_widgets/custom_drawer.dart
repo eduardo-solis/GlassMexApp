@@ -35,6 +35,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   Future<void> getClientData() async {
     final SharedPreferences sp = await _pref;
+    sp.reload();
     setState(() {
       var valor = sp.getString("idCliente").toString();
       if (valor != "null") {
@@ -49,35 +50,39 @@ class _CustomDrawerState extends State<CustomDrawer> {
     });
   }
 
-  Future<void> logout() async {
+  logout() async {
     final SharedPreferences sp = await _pref;
-    setState(() {
-      nombreCliente = " ";
-      id = "0";
+    nombreCliente = " ";
+    id = "0";
+    mostrarLogin = true;
+    mostrarLogout = false;
+    mostrarPerfil = false;
+    mostrarCarrito = true;
+    mostrarCompras = true;
 
-      mostrarLogin = true;
-      mostrarLogout = false;
-      mostrarPerfil = false;
-      mostrarCarrito = true;
-      mostrarCompras = true;
-      sp.remove("idCliente");
-      sp.remove("nombre");
-      sp.remove("primerApellido");
-      sp.remove("segundoApellido");
-      sp.remove("genero");
-      sp.remove("dia");
-      sp.remove("mes");
-      sp.remove("anio");
-      sp.remove("calle");
-      sp.remove("numero");
-      sp.remove("colonia");
-      sp.remove("cp");
-      sp.remove("ciudad");
-      sp.remove("estado");
-      sp.remove("correo");
-      sp.remove("correoRec");
-      sp.remove("contrasenia");
-    });
+    sp.remove("idCliente");
+    sp.remove("nombre");
+    sp.remove("primerApellido");
+    sp.remove("segundoApellido");
+    sp.remove("genero");
+    sp.remove("dia");
+    sp.remove("mes");
+    sp.remove("anio");
+    sp.remove("calle");
+    sp.remove("numero");
+    sp.remove("colonia");
+    sp.remove("cp");
+    sp.remove("ciudad");
+    sp.remove("estado");
+    sp.remove("correo");
+    sp.remove("correoRec");
+    sp.remove("contrasenia");
+    sp.reload();
+    setState(() {});
+    cerrarSesion();
+  }
+
+  void cerrarSesion() {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text(
         "Se cerro la sesión",
@@ -109,7 +114,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       }));
     }
 
-    void shopping_cart() {
+    void shoppingCart() {
       Navigator.pop(context);
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
@@ -119,7 +124,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       }));
     }
 
-    my_purchases() {
+    myPurchases() {
       Navigator.pop(context);
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
@@ -168,7 +173,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: ListTile(
               leading: const Icon(Icons.shopping_cart_outlined),
               title: const Text("Carrito de compras"),
-              onTap: shopping_cart,
+              onTap: shoppingCart,
             ),
           ),
           Visibility(
@@ -176,7 +181,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: ListTile(
               leading: const Icon(Icons.shopping_bag_outlined),
               title: const Text("Mis compras"),
-              onTap: my_purchases,
+              onTap: myPurchases,
             ),
           ),
           const Divider(),

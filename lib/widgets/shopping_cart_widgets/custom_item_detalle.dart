@@ -35,7 +35,6 @@ class _CustomItemDetalleState extends State<CustomItemDetalle> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initVariables();
   }

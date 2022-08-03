@@ -11,7 +11,7 @@ import '../widgets/shopping_cart_widgets/custom_item_detalle.dart';
 
 class ShoppingCartScreen extends StatefulWidget {
   const ShoppingCartScreen({Key? key, this.idUser}) : super(key: key);
-  final idUser;
+  final int? idUser;
 
   @override
   State<ShoppingCartScreen> createState() => _ShoppingCartScreenState();
@@ -19,8 +19,8 @@ class ShoppingCartScreen extends StatefulWidget {
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   late Database _database;
-  late VentasRepository _VentasRepository;
-  late DetalleVentasRepository _DetalleRepository;
+  late VentasRepository ventasRepository;
+  late DetalleVentasRepository detalleRepository;
   List<DetalleVentas> _detalles = List.empty();
   late int idVenta = 0;
   late double total = 0;
@@ -40,20 +40,19 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
   initVariables() async {
     _database = await DataBaseConnection.initiateDataBase();
-    _VentasRepository = VentasRepository(_database);
-    _DetalleRepository = DetalleVentasRepository(_database);
+    ventasRepository = VentasRepository(_database);
+    detalleRepository = DetalleVentasRepository(_database);
     refresGrid();
   }
 
   refresGrid() async {
-    await _VentasRepository.getVentaAbiertaByClient(widget.idUser)
+    await ventasRepository
+        .getVentaAbiertaByClient(widget.idUser!)
         .then((data) async {
-      print(data);
       if (data != null) {
         idVenta = data.idVenta;
         total = double.parse((data.total).toStringAsFixed(2));
-        _detalles = await _DetalleRepository.getAllByVenta(data.idVenta);
-        print(_detalles.toString());
+        _detalles = await detalleRepository.getAllByVenta(data.idVenta);
         activarBoton = true;
         setState(() {});
       } else {
@@ -98,17 +97,17 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     double newSubtotal = dv.precioUnitario * newCantidad;
     double newMedida = (dv.cmcVendidos / dv.cantidad) * newCantidad;
 
-    await _VentasRepository.getVenta(dv.idVenta).then((data) async {
+    await ventasRepository.getVenta(dv.idVenta).then((data) async {
       if (data != null) {
         double oldTotal = data.total;
         double newTotal = oldTotal - dv.subtotal + newSubtotal;
         data.total = newTotal;
 
-        await _VentasRepository.updateTotal(data.idVenta, data.total);
+        await ventasRepository.updateTotal(data.idVenta, data.total);
         dv.cantidad = newCantidad;
         dv.subtotal = newSubtotal;
         dv.cmcVendidos = newMedida;
-        await _DetalleRepository.update(dv);
+        await detalleRepository.update(dv);
       }
     });
   }
@@ -118,30 +117,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     double newSubtotal = dv.precioUnitario * newCantidad;
     double newMedida = (dv.cmcVendidos / dv.cantidad) * newCantidad;
 
-    await _VentasRepository.getVenta(dv.idVenta).then((data) async {
+    await ventasRepository.getVenta(dv.idVenta).then((data) async {
       if (data != null) {
         double oldTotal = data.total;
         double newTotal = oldTotal - dv.subtotal + newSubtotal;
         data.total = newTotal;
 
-        await _VentasRepository.updateTotal(data.idVenta, data.total);
+        await ventasRepository.updateTotal(data.idVenta, data.total);
         dv.cantidad = newCantidad;
         dv.subtotal = newSubtotal;
         dv.cmcVendidos = newMedida;
-        await _DetalleRepository.update(dv);
+        await detalleRepository.update(dv);
       }
     });
   }
 
   Future<void> eliminar(DetalleVentas dv) async {
-    await _VentasRepository.getVenta(dv.idVenta).then((data) async {
+    await ventasRepository.getVenta(dv.idVenta).then((data) async {
       if (data != null) {
         double oldTotal = data.total;
         double newTotal = oldTotal - dv.subtotal;
         data.total = newTotal;
 
-        await _VentasRepository.updateTotal(data.idVenta, data.total);
-        await _DetalleRepository.delete(dv.idDetalleVenta);
+        await ventasRepository.updateTotal(data.idVenta, data.total);
+        await detalleRepository.delete(dv.idDetalleVenta);
       }
     });
   }
@@ -216,9 +215,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         child: Column(
                       children: [
                         ElevatedButton(
-                          child: Icon(_detalles[index].cantidad >= 2
-                              ? Icons.exposure_minus_1_outlined
-                              : Icons.delete_outline),
                           style: _detalles[index].cantidad >= 2
                               ? estiloBotonMenos
                               : estiloBotonCancelar,
@@ -235,6 +231,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               });
                             }
                           },
+                          child: Icon(_detalles[index].cantidad >= 2
+                              ? Icons.exposure_minus_1_outlined
+                              : Icons.delete_outline),
                         ),
                         ElevatedButton(
                             onPressed: () {

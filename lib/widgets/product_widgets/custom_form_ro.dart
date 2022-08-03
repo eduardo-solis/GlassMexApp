@@ -36,6 +36,7 @@ class CustomFormRO extends StatelessWidget {
                           return "El valor debe ser entre 5 y 250 cm";
                         }
                       }
+                      return null;
                     },
                     textAlign: TextAlign.end,
                     decoration: const InputDecoration(labelText: "Ancho"),
@@ -74,6 +75,7 @@ class CustomFormRO extends StatelessWidget {
                           return "El valor debe ser entre 6 y 360 cm";
                         }
                       }
+                      return null;
                     },
                     controller: segundoValor,
                     textAlign: TextAlign.end,

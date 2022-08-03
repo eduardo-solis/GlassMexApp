@@ -3,12 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:glassmex/database/db_connection.dart';
 import 'package:glassmex/helpers/hexcolor.dart';
+import 'package:glassmex/models/clientes.dart';
 import 'package:glassmex/models/detalle_ventas.dart';
 import 'package:glassmex/models/productos.dart';
 import 'package:glassmex/models/ventas.dart';
+import 'package:glassmex/repositories/clientes_repository.dart';
 import 'package:glassmex/repositories/detalle_ventas_repository.dart';
 import 'package:glassmex/repositories/ventas_repository.dart';
 import 'package:glassmex/screens/login_screen.dart';
+import 'package:glassmex/screens/register_screen.dart';
 import 'package:glassmex/widgets/product_widgets/custom_form_cc.dart';
 import 'package:glassmex/widgets/product_widgets/custom_form_ro.dart';
 import 'package:glassmex/widgets/product_widgets/custom_info.dart';
@@ -32,9 +35,10 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
   late Database _database;
-  late ProductosRepository _ProductosRepository;
+  late ProductosRepository productosRepository;
   late VentasRepository _ventasRepository;
   late DetalleVentasRepository _detalleVentasRepository;
+  late ClientesRepository _clientesRepository;
   int? idCliente = 0;
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
 
@@ -42,17 +46,19 @@ class _ProductScreenState extends State<ProductScreen> {
   void initState() {
     super.initState();
     initVariables();
-    primerValor.text = "5";
-    segundoValor.text = "6";
-    cantidad.text = "1";
-    getClientData();
   }
 
   initVariables() async {
     _database = await DataBaseConnection.initiateDataBase();
-    _ProductosRepository = ProductosRepository(_database);
+    productosRepository = ProductosRepository(_database);
     _ventasRepository = VentasRepository(_database);
     _detalleVentasRepository = DetalleVentasRepository(_database);
+    _clientesRepository = ClientesRepository(_database);
+
+    primerValor.text = "5";
+    segundoValor.text = "6";
+    cantidad.text = "1";
+    getClientData();
   }
 
   String forma = '1';
@@ -82,6 +88,7 @@ class _ProductScreenState extends State<ProductScreen> {
   Future<void> getClientData() async {
     final SharedPreferences sp = await _pref;
     setState(() {
+      sp.reload();
       String? valor = sp.getString("idCliente");
 
       if (valor == null) {
@@ -92,12 +99,161 @@ class _ProductScreenState extends State<ProductScreen> {
     });
   }
 
+  abrirDialogo() async {
+    await loginDialog().whenComplete(() => setState(() {
+          initVariables();
+        }));
+  }
+
+  login(GlobalKey<FormState> key, TextEditingController correo,
+      TextEditingController contra) async {
+    String email = correo.text;
+    String pwd = contra.text;
+    if (key.currentState!.validate()) {
+      await _clientesRepository.getClient(email, pwd).then((data) {
+        if (data != null) {
+          setSP(data).whenComplete(() {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+                "Se inicio sesión correctamente",
+              ),
+              duration: Duration(seconds: 2),
+              backgroundColor: Colors.green,
+            ));
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+              "No se encontro el usuario",
+              style: TextStyle(color: Colors.black),
+            ),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.amber,
+          ));
+        }
+      });
+    }
+  }
+
+  void registrarCliente() {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return const RegisterScreen();
+    }));
+  }
+
+  Future setSP(Clientes user) async {
+    final SharedPreferences sp = await _pref;
+
+    sp.setString("idCliente", user.idCliente.toString());
+    sp.setString("nombre", user.nombre);
+    sp.setString("primerApellido", user.primerApellido);
+    sp.setString("segundoApellido", user.segundoApellido);
+    sp.setString("genero", user.genero);
+    sp.setString("dia", user.dia);
+    sp.setString("mes", user.mes);
+    sp.setString("anio", user.anio);
+    sp.setString("calle", user.calle);
+    sp.setString("numero", user.numero);
+    sp.setString("colonia", user.colonia);
+    sp.setString("cp", user.cp);
+    sp.setString("ciudad", user.ciudad);
+    sp.setString("estado", user.estado);
+    sp.setString("correo", user.correo);
+    sp.setString("correoRec", user.correoRec);
+    sp.setString("contrasenia", user.contrasenia);
+    sp.setString("estatus", user.estatus.toString());
+
+    sp.reload();
+  }
+
+  Future<void> loginDialog() async {
+    final conCorreo = TextEditingController();
+    final conContrasenia = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool mostrarContrasenia = true;
+
+    return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Form(
+          key: formKey,
+          child: AlertDialog(
+            title: const Text("Iniciar sesión"),
+            content: const Text(
+                "Es necesario iniciar sesión antes de realizar alguna compra."),
+            actions: [
+              TextFormField(
+                  controller: conCorreo,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    RegExp email =
+                        RegExp(r"[a-zA-Z0-9]+\@+[a-zA-Z]+\.+[a-zA-Z]");
+
+                    if (value!.isEmpty) {
+                      return "Se requiere ingresar un correo";
+                    } else if (!email.hasMatch(value)) {
+                      return "El correo no tiene el formato correcto";
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.email_outlined),
+                      labelText: "Correo")),
+              TextFormField(
+                obscureText: mostrarContrasenia,
+                controller: conContrasenia,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Se requiere ingresar la contraseña";
+                  } else if (value.length <= 8) {
+                    return "La contraseña debe ser mayor de 8 caracteres";
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.lock),
+                    labelText: "Contraseña",
+                    suffixIcon: IconButton(
+                        onPressed: () => setState(() {
+                              mostrarContrasenia = !mostrarContrasenia;
+                            }),
+                        icon: CustomIcon(mostrar: mostrarContrasenia))),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                      child: TextButton(
+                    child: const Text('Registrarse'),
+                    onPressed: () {
+                      registrarCliente();
+                    },
+                  )),
+                  Expanded(
+                      child: TextButton(
+                    child: const Text('Iniciar sesión'),
+                    onPressed: () {
+                      login(formKey, conCorreo, conContrasenia);
+                    },
+                  ))
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void agregarAlCarrito(
       String forma, String primerValor, String segundoValor) async {
     if (_formKey.currentState!.validate()) {
-      await _ProductosRepository.getProduct(widget.nombre, widget.grosor)
-          .then((data) async {
-        if (idCliente != 0) {
+      if (idCliente != 0) {
+        await productosRepository
+            .getProduct(widget.nombre, widget.grosor)
+            .then((data) async {
           int idVenta = 0;
           double subtotal = obtenerSubtotal(data!);
           double total = subtotal * int.parse(cantidad.text);
@@ -119,14 +275,10 @@ class _ProductScreenState extends State<ProductScreen> {
             registerDetalle(venta.idVenta, data.idProducto, subtotal, total,
                 int.parse(cantidad.text), cmVendidos, f);
           }
-          Navigator.pop(context);
-        } else {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) {
-            return const LoginScreen();
-          }));
-        }
-      });
+        }).whenComplete(() => Navigator.pop(context));
+      } else {
+        abrirDialogo();
+      }
     }
   }
 

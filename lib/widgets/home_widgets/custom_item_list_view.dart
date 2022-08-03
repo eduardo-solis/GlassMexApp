@@ -21,7 +21,7 @@ class _CustomItemListViewState extends State<CustomItemListView> {
   bool isVisibility = false;
 
   void irDetalleProducto(String nombre, String grosor, String img) {
-    print("Se dirige al detalle del producto");
+    //Se dirige al detalle del producto
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return ProductScreen(nombre: nombre, grosor: grosor, img: img);
     }));

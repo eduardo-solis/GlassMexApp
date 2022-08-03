@@ -37,7 +37,7 @@ class UpdateProductScreen extends StatefulWidget {
 
 class _UpdateProductScreenState extends State<UpdateProductScreen> {
   late Database _database;
-  late ProductosRepository _ProductosRepository;
+  late ProductosRepository productosRepository;
   late VentasRepository _ventasRepository;
   late DetalleVentasRepository _detalleVentasRepository;
   int? idCliente = 0;
@@ -58,11 +58,11 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
 
   initVariables() async {
     _database = await DataBaseConnection.initiateDataBase();
-    _ProductosRepository = ProductosRepository(_database);
+    productosRepository = ProductosRepository(_database);
     _ventasRepository = VentasRepository(_database);
     _detalleVentasRepository = DetalleVentasRepository(_database);
 
-    await _ProductosRepository.getProductById(widget.idProducto).then((data) {
+    await productosRepository.getProductById(widget.idProducto).then((data) {
       if (data != null) {
         nombre = data.nombre;
         grosor = data.grosor;
@@ -115,8 +115,8 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
   void agregarAlCarrito(
       String forma, String primerValor, String segundoValor) async {
     if (_formKey.currentState!.validate()) {
-      await _ProductosRepository.getProduct(nombre, grosor).then((data) async {
-        if (idCliente != 0) {
+      if (idCliente != 0) {
+        await productosRepository.getProduct(nombre, grosor).then((data) async {
           int idVenta = 0;
           double subtotal = obtenerSubtotal(data!);
           double total = subtotal * int.parse(cantidad.text);
@@ -138,14 +138,13 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
             registerDetalle(venta.idVenta, data.idProducto, subtotal, total,
                 int.parse(cantidad.text), cmVendidos, f);
           }
-          Navigator.pop(context);
-        } else {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) {
-            return const LoginScreen();
-          }));
-        }
-      });
+        }).whenComplete(() => Navigator.pop(context));
+      } else {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return const LoginScreen();
+        }));
+      }
     }
   }
 
@@ -359,6 +358,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                             return "La cantidad debe ser mayor a 0";
                           }
                         }
+                        return null;
                       },
                       textAlign: TextAlign.end,
                       decoration: const InputDecoration(labelText: "Cantidad"),
@@ -367,14 +367,14 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                     const SizedBox(
                       height: 50,
                     ),
-                    ElevatedButton(
+                    const ElevatedButton(
                         onPressed:
                             null /*() {
                           agregarAlCarrito(
                               forma, primerValor.text, segundoValor.text);
                         }*/
                         ,
-                        child: const Text(
+                        child: Text(
                           "Agregar al carrito",
                           style: TextStyle(color: Colors.white),
                         ))

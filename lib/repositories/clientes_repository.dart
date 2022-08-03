@@ -68,7 +68,7 @@ class ClientesRepository {
 
   Future<int> update(Clientes modelo) async {
     // Actualización utilizando raw
-    var count = await _database.rawUpdate(
+    await _database.rawUpdate(
         'UPDATE clientes SET calle = ?, numero = ?, colonia = ?, cp = ?, ciudad = ?, estado = ?, correo = ?, correoRec = ?, contrasenia = ? WHERE idCliente = ?',
         [
           modelo.calle,
