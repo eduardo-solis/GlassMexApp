@@ -26,7 +26,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   late double total = 0;
   bool activarBoton = false;
 
-  ButtonStyle estiloBotonMas = ElevatedButton.styleFrom(primary: Colors.green);
+  ButtonStyle estiloBotonMas = ElevatedButton.styleFrom(primary: Colors.blue);
   ButtonStyle estiloBotonMenos =
       ElevatedButton.styleFrom(primary: Colors.amber);
   ButtonStyle estiloBotonCancelar =
@@ -53,17 +53,23 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         idVenta = data.idVenta;
         total = double.parse((data.total).toStringAsFixed(2));
         _detalles = await detalleRepository.getAllByVenta(data.idVenta);
-        activarBoton = true;
+        if (_detalles.isNotEmpty) {
+          activarBoton = true;
+        }
         setState(() {});
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-            "No se ha añadido nada al carrito de compras",
-            style: TextStyle(color: Colors.black),
-          ),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.amber,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text(
+              "No se ha añadido nada al carrito de compras",
+              style: TextStyle(color: Colors.black),
+            ),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.amber,
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            )));
         activarBoton = false;
         setState(() {});
       }
@@ -80,56 +86,66 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     }));
   }
 
-  cambio(int i, DetalleVentas dv) {
-    if (i == 1) {
-      masUno(dv);
+  cambiarCantidad(DetalleVentas dv, TextEditingController conCantidad) async {
+    int newCantidad = int.parse(conCantidad.text);
+    int oldCantidad = dv.cantidad;
+
+    double newSubtotal = dv.precioUnitario * newCantidad;
+    double newMedida = (dv.cmcVendidos / dv.cantidad) * newCantidad;
+
+    if (newCantidad != oldCantidad) {
+      await ventasRepository.getVenta(dv.idVenta).then((data) async {
+        double oldTotal = data!.total;
+        double newTotal = oldTotal - dv.subtotal + newSubtotal;
+        data.total = newTotal;
+
+        await ventasRepository.updateTotal(data.idVenta, data.total);
+
+        dv.cantidad = newCantidad;
+        dv.subtotal = newSubtotal;
+        dv.cmcVendidos = newMedida;
+        await detalleRepository.update(dv);
+      }).whenComplete(() {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text(
+            "Se ha actualizado el producto",
+          ),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ));
+      }).onError((error, stackTrace) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text(
+            "Se ha producido un error al intentar actualizar",
+          ),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.red,
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ));
+      });
     } else {
-      if (i == 2) {
-        menosUno(dv);
-      } else {
-        eliminar(dv);
-      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text(
+          "No se ha actualizado ya que es la misma cantidad",
+        ),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.amber,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ));
     }
-  }
-
-  Future<void> masUno(DetalleVentas dv) async {
-    int newCantidad = dv.cantidad + 1;
-    double newSubtotal = dv.precioUnitario * newCantidad;
-    double newMedida = (dv.cmcVendidos / dv.cantidad) * newCantidad;
-
-    await ventasRepository.getVenta(dv.idVenta).then((data) async {
-      if (data != null) {
-        double oldTotal = data.total;
-        double newTotal = oldTotal - dv.subtotal + newSubtotal;
-        data.total = newTotal;
-
-        await ventasRepository.updateTotal(data.idVenta, data.total);
-        dv.cantidad = newCantidad;
-        dv.subtotal = newSubtotal;
-        dv.cmcVendidos = newMedida;
-        await detalleRepository.update(dv);
-      }
-    });
-  }
-
-  Future<void> menosUno(DetalleVentas dv) async {
-    int newCantidad = dv.cantidad - 1;
-    double newSubtotal = dv.precioUnitario * newCantidad;
-    double newMedida = (dv.cmcVendidos / dv.cantidad) * newCantidad;
-
-    await ventasRepository.getVenta(dv.idVenta).then((data) async {
-      if (data != null) {
-        double oldTotal = data.total;
-        double newTotal = oldTotal - dv.subtotal + newSubtotal;
-        data.total = newTotal;
-
-        await ventasRepository.updateTotal(data.idVenta, data.total);
-        dv.cantidad = newCantidad;
-        dv.subtotal = newSubtotal;
-        dv.cmcVendidos = newMedida;
-        await detalleRepository.update(dv);
-      }
-    });
   }
 
   Future<void> eliminar(DetalleVentas dv) async {
@@ -142,7 +158,71 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         await ventasRepository.updateTotal(data.idVenta, data.total);
         await detalleRepository.delete(dv.idDetalleVenta);
       }
+    }).whenComplete(() {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text(
+          "Se ha eliminado el producto",
+        ),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.amber,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ));
+
+      initVariables();
+      setState(() {});
     });
+  }
+
+  Future<void> editDialog(DetalleVentas dv) async {
+    final conCantidad = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return Form(
+          key: formKey,
+          child: AlertDialog(
+            title: const Text("Cambiar cantidad"),
+            content: const Text("Ingrese el valor de la cantidad deseada."),
+            actions: [
+              TextFormField(
+                controller: conCantidad,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  String valor = value!.trim();
+                  if (valor.isEmpty ||
+                      valor.contains(".") ||
+                      valor.contains(",") ||
+                      valor.contains("-") ||
+                      valor == "0") {
+                    return "Es necesario ingresar un numero entero";
+                  }
+                },
+                decoration: const InputDecoration(label: Text("Cantidad")),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              TextButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      cambiarCantidad(dv, conCantidad);
+                      Navigator.of(context).pop();
+                      initVariables();
+                      setState(() {});
+                    }
+                  },
+                  child: const Text("Cambiar"))
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -200,35 +280,18 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         child: Column(
                       children: [
                         ElevatedButton(
-                          style: _detalles[index].cantidad >= 2
-                              ? estiloBotonMenos
-                              : estiloBotonCancelar,
+                          style: estiloBotonCancelar,
                           onPressed: () {
-                            if (_detalles[index].cantidad >= 2) {
-                              cambio(2, _detalles[index]);
-                              setState(() {
-                                initVariables();
-                              });
-                            } else {
-                              cambio(3, _detalles[index]);
-                              setState(() {
-                                initVariables();
-                              });
-                            }
+                            eliminar(_detalles[index]);
                           },
-                          child: Icon(_detalles[index].cantidad >= 2
-                              ? Icons.exposure_minus_1_outlined
-                              : Icons.delete_outline),
+                          child: const Icon(Icons.delete_outline),
                         ),
                         ElevatedButton(
                             onPressed: () {
-                              cambio(1, _detalles[index]);
-                              setState(() {
-                                initVariables();
-                              });
+                              editDialog(_detalles[index]);
                             },
                             style: estiloBotonMas,
-                            child: const Icon(Icons.exposure_plus_1_outlined))
+                            child: const Icon(Icons.edit))
                       ],
                     ))
                   ],
@@ -240,8 +303,21 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          if (activarBoton) {
+          if (_detalles.isNotEmpty) {
             pagar();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: const Text(
+                "No se tiene ningun producto en el carrito",
+              ),
+              duration: const Duration(seconds: 2),
+              backgroundColor: Colors.amber,
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ));
           }
         },
         splashColor: Colors.green,
