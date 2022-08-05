@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:glassmex/models/clientes.dart';
+import 'dart:convert';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 import '../database/db_connection.dart';
 import '../repositories/clientes_repository.dart';
@@ -114,6 +116,130 @@ class _LoginScreenState extends State<LoginScreen> {
     }));
   }
 
+  Future recuperarContrasenia(Clientes cliente) async {
+    final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+    const serviceId = 'service_j0rnl8q';
+    const templateId = 'template_tyr3eno';
+    const userId = 'ys1dCtm6egTasQdLn';
+    const token = "pB8pjcts-dOpxoP9qrcG-";
+
+    final response = await http.post(url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'service_id': serviceId,
+          'template_id': templateId,
+          'user_id': userId,
+          'accessToken': token,
+          'template_params': {
+            'user':
+                '${cliente.nombre} ${cliente.primerApellido} ${cliente.segundoApellido}',
+            'account': cliente.correo,
+            'password': cliente.contrasenia,
+            'user_email': cliente.correoRec
+          }
+        }));
+    print("Estatus ${response.statusCode} ");
+    print("Body ${response.body} ");
+    return response.statusCode;
+  }
+
+  buscarCliente(String correo) async {
+    await _clientesRepository.getClientByEmail(correo).then((value) async {
+      if (value != null) {
+        await recuperarContrasenia(value).whenComplete(() {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text(
+              "Se ha enviado el correo",
+              style: TextStyle(color: Colors.black),
+            ),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.green,
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ));
+        });
+      } else {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text(
+            "No se encontro el usuario",
+            style: TextStyle(color: Colors.black),
+          ),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.amber,
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ));
+      }
+    }).onError((error, stackTrace) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text(
+          "Ha ocurrido un error",
+          style: TextStyle(color: Colors.black),
+        ),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.red,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ));
+    });
+  }
+
+  Future recuperarContraDialog() async {
+    TextEditingController conCorreo = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return Form(
+          key: formKey,
+          child: AlertDialog(
+            title: const Text("Recuperar contraseña"),
+            content: const Text(
+                "Escribe el correo asociado a la cuenta, se enviara la contraseña al correo de recuperación que se haya registrado para la cuenta."),
+            actions: [
+              TextFormField(
+                controller: conCorreo,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                    label: Text("Correo"),
+                    prefixIcon: Icon(Icons.email_outlined)),
+                validator: (value) {
+                  RegExp email = RegExp(r"[a-zA-Z0-9]+\@+[a-zA-Z]+\.+[a-zA-Z]");
+
+                  if (value!.isEmpty) {
+                    return "Se requiere ingresar un correo";
+                  } else if (!email.hasMatch(value)) {
+                    return "El correo no tiene el formato correcto";
+                  }
+                  return null;
+                },
+              ),
+              TextButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      buscarCliente(conCorreo.text);
+                    }
+                  },
+                  child: const Text("Recuperar"))
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,6 +308,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: registrarCliente,
                       child: Text(
                         "Registrate!!",
+                        style: TextStyle(
+                            color: HexColor("01688c"),
+                            decoration: TextDecoration.underline),
+                      )),
+                  TextButton(
+                      onPressed: recuperarContraDialog,
+                      child: Text(
+                        "Recuperar contraseña",
                         style: TextStyle(
                             color: HexColor("01688c"),
                             decoration: TextDecoration.underline),

@@ -99,9 +99,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (widget.idUser == 0) {
       register();
       Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text(
+          "Se ha registrado correctamente",
+          style: TextStyle(color: Colors.black),
+        ),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.green,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ));
     } else {
       update();
       Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text(
+          "Se ha actualizado correctamente",
+          style: TextStyle(color: Colors.black),
+        ),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.green,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ));
     }
   }
 

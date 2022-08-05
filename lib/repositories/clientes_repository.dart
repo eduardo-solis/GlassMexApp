@@ -50,6 +50,17 @@ class ClientesRepository {
     return null;
   }
 
+  Future<Clientes?> getClientByEmail(String correo) async {
+    var result = await _database
+        .rawQuery("SELECT * FROM clientes WHERE correo = ?", [correo]);
+
+    if (result.isNotEmpty) {
+      return Clientes.formMap(result.first);
+    }
+
+    return null;
+  }
+
   Future<Clientes?> getClientById(String id) async {
     var result = await _database
         .rawQuery("SELECT * FROM clientes WHERE idCliente = ?", [id]);
