@@ -72,7 +72,7 @@ class _MyPurchasesScreenState extends State<MyPurchasesScreen> {
                 children: [
                   Text("No. Venta: ${_ventas[index].idVenta}"),
                   Text(
-                      "No. Total: ${double.parse((_ventas[index].total).toStringAsFixed(2))}"),
+                      "No. Total: \$ ${double.parse((_ventas[index].total).toStringAsFixed(2))} MXN"),
                   Text("Fecha de compra: ${_ventas[index].fechaVenta}"),
                   Text("Fecha de entrega: ${_ventas[index].fechaEntrega}"),
                   CustomDetalle(
@@ -146,10 +146,10 @@ class _CustomDetalleState extends State<CustomDetalle> {
                       const Divider(),
                       Text("Forma: ${_detalle[index].forma}"),
                       Text(
-                          "Precio unitario: ${double.parse((_detalle[index].precioUnitario).toStringAsFixed(2))}"),
+                          "Precio unitario: \$${double.parse((_detalle[index].precioUnitario).toStringAsFixed(2))} MXN"),
                       Text("Cantidad: ${_detalle[index].cantidad}"),
                       Text(
-                          "Subtotal: ${double.parse((_detalle[index].subtotal).toStringAsFixed(2))}")
+                          "Subtotal: \$${double.parse((_detalle[index].subtotal).toStringAsFixed(2))} MXN")
                     ],
                   ),
                 ],

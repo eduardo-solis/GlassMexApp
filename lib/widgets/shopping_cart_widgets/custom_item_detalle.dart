@@ -65,9 +65,9 @@ class _CustomItemDetalleState extends State<CustomItemDetalle> {
             children: [
               Text(nombre),
               Text("Forma: ${widget.forma}"),
-              Text("Precio unitario ${widget.precioUnitario}"),
-              Text("Cantidad ${widget.cantidad}"),
-              Text("Subtotal ${widget.subtotal}")
+              Text("Precio unitario: \$${widget.precioUnitario} MXN"),
+              Text("Cantidad: ${widget.cantidad}"),
+              Text("Subtotal: \$${widget.subtotal} MXN")
             ],
           )
         ],

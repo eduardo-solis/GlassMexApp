@@ -248,7 +248,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   Column(
                     children: [
                       Text(
-                        "Total: $total",
+                        "Total: \n\$$total MXN",
                         style: const TextStyle(fontSize: 30),
                       )
                     ],

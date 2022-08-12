@@ -149,7 +149,7 @@ class _PayScreenState extends State<PayScreen> {
                   height: 25,
                 ),
                 Text(
-                  "Total a pagar: ${widget.total}",
+                  "Total a pagar: \n\$${widget.total} MXN",
                   style: const TextStyle(fontSize: 20),
                 ),
                 const SizedBox(
